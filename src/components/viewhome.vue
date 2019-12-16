@@ -2,7 +2,7 @@
     <div class="container mt-5">
         <router-link class="btn-sm btn btn-primary" to="/add"><i class="fa fa-plus-square-o"></i> ADD NEW STAFFS</router-link>
         <button class="btn-sm btn btn-success" @click="resetJsonArray"><i class="fa fa-refresh"></i> Reset Json Array</button>
-     
+        
 <!-- Alert Box for delete success --> 
         <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert" v-show="this.successDelMsg">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -17,6 +17,8 @@
           <div class="table-responsive-sm mt-4">
               <table class="table">
                 <thead class="bg-dark text-light">
+<!--                   <th scope="col">Data ID</th>
+ -->                  
                   <th scope="col">Staff ID</th>
                   <th scope="col">Name</th>
                   <th scope="col">Address</th>
@@ -25,20 +27,26 @@
                 </thead>
                 
                 <tr v-for="(items,index) in addedArray" :key="items.DataID">
+<!--                   <td> {{index}}</td>  
+                  <td>{{items.DataID}}</td>
+ -->                  
                   <td>{{items.staffID}}</td>
                   <td>{{items.staffname}}</td>
                   <td>{{items.address}}</td>
                   <td>{{items.nic}}</td>
                   <td>
-                    <button @click="editForm(items)" class="btn btn-primary btn-sm"  data-toggle="modal" data-target="#exampleModal"><i class="fa fa-edit"></i> Edit </button> 
-                      <button @click="removeForm(index)" class="btn btn-danger btn-sm" to="/"><i class="fa fa-trash"></i> Delete</button>
+                    <button @click="editForm(items,index)" class="btn btn-primary btn-sm"  data-toggle="modal" data-target="#editModal"><i class="fa fa-edit"></i> Edit </button> 
+                    <!-- <button @click="removeForm(index)" class="btn btn-danger btn-sm" to="/"><i class="fa fa-trash"></i> Delete</button> -->
+                    <button @click="removeForm(index)" class="btn btn-danger btn-sm" to="/" data-toggle="modal" data-target="#deleteModal"><i class="fa fa-trash"></i> Delete</button>
                   </td>
                 </tr>
               </table>
             </div>
+                        
 
-<!-- Modal Section-->
-            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Edi Modal Section-->
+          <form action="" method="post" @submit.prevent="UpdateForm">
+            <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
 
@@ -54,7 +62,6 @@
                     <div class="modal-body">
                       <p class="bg-success text-light rounded mb-5 p-3" v-if="this.successMsg"> {{successMsg}} </p>
                 
-                        <form action="" method="post" >
 
                             <!-- Display Validation Error -->
                             <p v-if="errors.length">
@@ -63,6 +70,7 @@
                                   <li v-for="error in errors" :key="error">{{ error }}</li>
                                 </ul>
                             </p>      
+
 
                               <div class="form-group">
                                 <label for="">Staff Name</label>
@@ -76,26 +84,70 @@
                               
                               <div class="form-group">
                                 <label for="">NIC</label>
-                                <input type="text" class="form-control" name="nic" id="nic" v-model="nic" :maxlength="maxNICLength" :minlength="minNICLength" aria-describedby="helpId" placeholder=""> 
+                                <input type="text" class="form-control" name="nic" id="nic" v-model="nic" :maxlength="maxNICLength" :minlength="this.minNICLength" aria-describedby="helpId" placeholder=""> 
                               </div>
 
                               <input type="hidden" disabled name="DataID" id="DataID" v-model="DataID">
+                  
                               <input type="hidden" name="staffID" id="staffID" v-model="staffID">
+
+
                             
-                        </form>
                     </div>
 
                     <!-- Model Footer -->
                     <div class="modal-footer">
-
+                      
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      <button @click="UpdateForm" class="btn btn-primary"  v-if="this.staffID" >update </button> 
-                    
+                      <button   class="btn btn-primary"  >update </button> 
                     </div>
 
                 </div>
               </div>
             </div>   
+         </form>
+
+<!-- Delete Modal Section--> 
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+
+                    <!-- Model Header -->
+                    <div class="modal-header">
+                      <h5 class="modal-title text-danger" id="exampleModalLabel">Delete Confirmation</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    
+                    <!-- Model Body -->
+                    <div class="modal-body">
+                    
+                      <div class="row">
+                        <div class="col-xl-12 ">
+                          
+                        </div>
+                        <div class="col-xl-6 "> Do you want to delete it?  </div>
+                        <div class="col-xl-6 " >  
+                          
+                          <button type="button" class="btn btn-secondary ml-3" data-dismiss="modal">Cancel</button>
+                          <button   class="btn btn-danger ml-3" @click="removeModel()" data-dismiss="modal" >Delete </button> 
+                         
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <!-- Model Footer -->
+                    <div class="modal-footer">
+                      
+                    </div>
+
+                </div>
+              </div>
+            </div>   
+   
      </div>
      
 
@@ -128,6 +180,8 @@ export default {
             successDelMsg:null,
             maxNICLength:9,
             minNICLength:9,
+            arrayIndexID:null,
+            delID:null,
         }
     },
    
@@ -172,24 +226,45 @@ export default {
               return re.test(nic);
         },
 
-    // Deleting a data from Json Array
-        removeForm:function(index){ 
+    // Deleting form Model
+        removeModel:function(){
+           
+            var delIndexID = this.delID
             
-            /*  alert('Delete');  */
-            var res = this.addedArray[index].staffname;
+            var res = this.addedArray[delIndexID].staffname;
               
+            
 
+             const STORAGE_KEY = 'STAFF-MANAGMENT';
+             this.addedArray.splice(delIndexID,1);
+             localStorage.setItem(STORAGE_KEY, JSON.stringify(this.addedArray));
+             this.successDelMsg=res;
+          
+
+
+            
+        },
+
+    // Deleting a data from Json Array
+        removeForm:function(index){  
+
+             /* var res = this.addedArray[index].staffname;
+              
+            
 
              const STORAGE_KEY = 'STAFF-MANAGMENT';
              this.addedArray.splice(index,1);
              localStorage.setItem(STORAGE_KEY, JSON.stringify(this.addedArray));
-             this.successDelMsg=res;
-       
-              
+             this.successDelMsg=res;   */
+
+         this.delID = index;
+         
+
+            /*  alert('Delete');  */  
         },
 
     // Fetching Data to Form
-        editForm:function(items){ 
+        editForm:function(items,index){ 
              
           /*   alert('edited');  */
             var re = /^[0-9]*$/;
@@ -198,6 +273,7 @@ export default {
             this.staffID = items.staffID;
             this.address = items.address;
             this.DataID = items.DataID;
+            this.arrayIndexID = index;
 
             var intNiC = items.nic;
             var str = intNiC;
@@ -213,6 +289,8 @@ export default {
             /* alert('update'); */
             
             this.errors = [];   
+
+ 
             
             if (!this.staffname) {  this.errors.push('Staff Name is Mandatory');  }
 
@@ -228,22 +306,29 @@ export default {
             
             else if(this.staffname && this.validStaffNameLetters(this.staffname) && this.address && this.validAddressCharacters(this.address) && this.nic && this.validNIC(this.nic)){
              
-                if (this.nic && this.staffname && this.address) {
+                if (this.nic && this.staffname && this.address ) {
 
                       var str = this.DataID;
+                      var AID = this.arrayIndexID;
                       /* alert(str); */
 
-                      if(str == null){
-                          alert('Data not Exsist')
+                      if(str == this.DataID){
+                          console.log(this.arrayIndexID);
+                      }
+                      else{
+                        console.log('null false');
                       }
 
-                      if (this.addedArray[str].DataID == str) {
+                      
+
+                      //if (this.addedArray[str].DataID == str) {
+                      //if (this.arrayIndexID == this.arrayIndexID) {
 
                         const STORAGE_KEY = 'STAFF-MANAGMENT';
 
-                        var DD=  this.addedArray[str].staffname = this.staffname;
-                        var EE=  this.addedArray[str].address = this.address;
-                        var FF=  this.addedArray[str].nic = this.nic+'V';
+                        var DD=  this.addedArray[AID].staffname = this.staffname;
+                        var EE=  this.addedArray[AID].address = this.address;
+                        var FF=  this.addedArray[AID].nic = this.nic+'V';
 
                         this.updateArray.push( {DataID:this.addedArray.length,staffname:this.DD,address:this.EE,nic:this.FF+'V'});    
                         
@@ -256,11 +341,7 @@ export default {
                         
                         /* alert('Done'); */
                         this.successMsg="Staff information has been updated successfully ";
-                      }
-                      else
-                          {
-                              alert('Update Failed: Array Index & Data ID Does not match, Click reset JSon array button to do update and then do the update function / try to update without deleting');
-                          }
+                      
                   }
              else
              {

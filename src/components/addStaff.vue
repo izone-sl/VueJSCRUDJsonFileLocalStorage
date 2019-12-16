@@ -24,7 +24,7 @@
                     <div class="form-group">
                         <label for="">Address</label>
                         <input type="text" class="form-control" name="address" id="address" v-model="address" aria-describedby="helpId" placeholder=""> 
-                    </div>
+                    </div> 
                     
                     <div class="form-group">
                         <label for="">NIC</label>

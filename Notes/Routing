@@ -1,0 +1,68 @@
+### Routing VueJS make single page application
+
+  1.  Create a folder within src "src -> components" // where we Create ui files 
+
+  2.  Create vue files ""navbar.vue | home.vue | register.vue " //use boostrap CDN in index.hmtl
+
+  3.  Create router.js file inside the src
+
+  4.  install vue-router 
+            -- npm install vue-router
+
+  5. import vue-router, router.js in main.js
+            import Vue from 'vue'
+            import App from './App.vue'
+            import VueRouter from 'vue-router'
+            import Router from './routes.js'   
+
+            Vue.use(VueRouter) 
+
+            new Vue({
+            el: '#app',
+            render: h => h(App),
+            router:Router
+            })
+
+  6. change the App.vue as follows
+            <template>
+                <div id="app">
+
+                    <navbar></navbar>
+                    <router-view></router-view>
+
+                </div>
+            </template>
+
+            <script>
+                import Navbar from './components/navbar.vue';
+                export default {
+                    name: 'app', 
+                    components:{
+                        'navbar':Navbar
+                    }
+                }
+            </script>
+
+   7. import ui components, vue-router and then set a path and export the router 
+            import Vue from 'vue'
+            import VueRouter from 'vue-router'
+
+            import home from './components/home.vue'; 
+            import register from './components/register.vue'; 
+
+            Vue.use(VueRouter)
+
+            const router  = new VueRouter ({
+
+                mode  :'history',
+                routes:[  
+                        {path: "/", component:home},
+                        {path: "/register", component:register},
+                    ]
+            });
+            export default router
+
+   8. use following code in navbar.vue to navigate into another page without redirect
+              <router-link class="nav-link" to="/add">Add Staffs</router-link>
+
+

@@ -13,12 +13,16 @@ import Navbar from './components/navbar.vue';
 
 
 export default {
+
+
+
   name: 'app', 
   components:{
     
     'navbar':Navbar
 
-  }
+  },
+  
 
 }
 </script>

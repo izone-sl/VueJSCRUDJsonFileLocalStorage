@@ -12,7 +12,7 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav  justify-content-end">
               <li class="nav-item active">
-                  <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+                  <router-link class="nav-link" to="/" if>Home <span class="sr-only">(current)</span></router-link>
               </li>
               <li class="nav-item">
                   <router-link class="nav-link" to="/add">Add Staffs</router-link>

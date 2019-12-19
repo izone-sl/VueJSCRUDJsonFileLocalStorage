@@ -1,0 +1,15 @@
+#### Creating a Vue Project
+
+1. Select a folder inside the xampp/htdocs
+2. do follow code to install vue package
+
+    -- vue init webpack-simple staffmanagmentfrontend
+        ? Project name (staffmanagmentfrontend)            ( yes | Enter)
+        ? Project description (A Vue.js project)           ( set a desc / leave it blank | Enter)
+        ? Author Raza9798                                  ( Change or / leave it blank | Enter)
+        ? License (MIT)                                    ( Enter)
+        ? Use sass? (y/N)                                  (No | Enter)
+
+    -- cd staffmanagmentfrontend
+    -- npm install
+    -- npm run dev
